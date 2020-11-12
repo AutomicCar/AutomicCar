@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     btnOff.setBackgroundResource(R.drawable.button33);
                     Toast.makeText(getApplication(),"종료합니다",Toast.LENGTH_SHORT).show();
                     mSendData = new SendData();
-                    CMD = "PP,00";
+                    CMD = "P,00";
                     //보내기 시작
                     mSendData.start();
                 }
@@ -197,58 +197,155 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //8축 조이스틱
+//        layout_joystick.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View arg0, MotionEvent arg1) {
+//                js.drawStick(arg1);
+//                if (arg1.getAction() == MotionEvent.ACTION_DOWN
+//                        || arg1.getAction() == MotionEvent.ACTION_MOVE) {
+//                    int direction = js.get8Direction();
+//                    if (direction == JoyStickClass.STICK_UP) {
+//                        mSendData = new SendData();
+//                        CMD = "FF,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_UPRIGHT) {
+//                        mSendData = new SendData();
+//                        CMD = "FR,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_RIGHT) {
+//                        mSendData = new SendData();
+//                        CMD = "RR,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
+//                        mSendData = new SendData();
+//                        CMD = "BR,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_DOWN) {
+//                        mSendData = new SendData();
+//                        CMD = "BB,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
+//                        mSendData = new SendData();
+//                        CMD = "BL,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_LEFT) {
+//                        mSendData = new SendData();
+//                        CMD = "LL,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_UPLEFT) {
+//                        mSendData = new SendData();
+//                        CMD = "FL,80";
+//                        mSendData.start();
+//                    } else if (direction == JoyStickClass.STICK_NONE) {
+//                        mSendData = new SendData();
+//                        CMD = "SS,00";
+//                        mSendData.start();
+//                    }
+//                } else if (arg1.getAction() == MotionEvent.ACTION_UP) {
+//                    mSendData = new SendData();
+//                    CMD = "SS,00";
+//                    mSendData.start();
+//                }
+//                return true;
+//            }
+//        });
+
         layout_joystick.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                js.drawStick(arg1);
-                if (arg1.getAction() == MotionEvent.ACTION_DOWN
-                        || arg1.getAction() == MotionEvent.ACTION_MOVE) {
-                    int direction = js.get8Direction();
-                    if (direction == JoyStickClass.STICK_UP) {
-                        mSendData = new SendData();
-                        CMD = "FF,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_UPRIGHT) {
-                        mSendData = new SendData();
-                        CMD = "FR,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_RIGHT) {
-                        mSendData = new SendData();
-                        CMD = "RR,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
-                        mSendData = new SendData();
-                        CMD = "BR,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_DOWN) {
-                        mSendData = new SendData();
-                        CMD = "BB,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
-                        mSendData = new SendData();
-                        CMD = "BL,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_LEFT) {
-                        mSendData = new SendData();
-                        CMD = "LL,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_UPLEFT) {
-                        mSendData = new SendData();
-                        CMD = "FL,80";
-                        mSendData.start();
-                    } else if (direction == JoyStickClass.STICK_NONE) {
-                        mSendData = new SendData();
-                        CMD = "SS,00";
-                        mSendData.start();
+            public boolean onTouch(View v, MotionEvent event) {
+                js.drawStick(event);
+                //textX.setText("X : " + String.valueOf(js.getX()));
+//                textY.setText("Y : " + String.valueOf(js.getY()));
+//                textAngle.setText("Angle : " + String.valueOf(js.getAngle()));
+//                textDistance.setText("Distance : " + String.valueOf(js.getDistance()));
+                int valueX =js.getX(), valueY = js.getY();
+                Float angle = js.getAngle();
+                //int distance = 0; //js.getDistance();
+                float distance = js.getDistance();
+                String L = "", R = "";
+                double numL, numR;
+
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN
+                        || event.getAction() == MotionEvent.ACTION_MOVE) {
+                    //int direction = js.get8Direction();
+                    String direction = js.get2Direction();
+//                    textDirection.setText("Distance : " + String.valueOf(js.get2Direction()));
+                    //if (distance >360){distance=360;}
+
+                    if (valueY >= 0) {
+                        //textDirection.setText("Direction : Up");
+
+                        if (angle % 180 * 1.1 < 99) {
+                            numL = (angle % 180 * 1.11 * (distance / 320));
+                            L = String.valueOf(Math.round(numL));
+//                            L = String.format("%d", angle % 180 * 1.11 * (distance / 360 * 100));
+//                            R = String.format("%d", 50 + angle % 180 * 0.55 * (distance / 360 * 100));
+                            numR = (50 + angle % 180 * 0.55 * (distance / 320));
+                            R = String.valueOf(Math.round(numR));
+                        } else {
+//                            L = String.format("%d", 100 - angle % 180 * 0.55 * (distance / 360 * 100));
+//                            R = String.format("%d", 100 - angle % 180 * 1.11 * (distance / 360 * 100));
+
+                            numL = (100 - angle % 180 * 0.55 * (distance / 320));
+                            L = String.valueOf(Math.round(numL));
+                            numR = (100 - angle % 180 * 1.11 * (distance / 320));
+                            R = String.valueOf(Math.round(numR));
+                        }
                     }
-                } else if (arg1.getAction() == MotionEvent.ACTION_UP) {
+                    else {
+                        if (angle % 180 * 1.1 >= -100) {
+//                            L = String.format("%d", -50 - angle % 180 * 0.55 * (distance / 360 * 100));
+//                            R = String.format("%d", -angle % 180 * 1.11 * (distance / 360 * 100));
+
+                            numL = (-50 - angle % 180 * 0.55 * (distance / 320));
+                            numR = (-angle % 180 * 1.11 * (distance / 320));
+                            if (numL>100){ numL=100;}
+                            if (numR>100){ numR=100;}
+                            if (numL<30){ numL*=1.5;}
+                            if (numR<30){ numR*=1.5;}
+                            L = String.valueOf(Math.round(numL));
+                            R = String.valueOf(Math.round(numR));
+                        } else {
+//                            L = String.format("%d", -100 + angle % 180 * 1.11 * (distance / 360 * 100));
+//                            R = String.format("%d", -100 + angle % 180 * 0.55 * (distance / 360 * 100));
+
+                            numL = (-100 + angle % 180 * 1.11 * (distance / 320));
+                            L = String.valueOf(Math.round(numL));
+                            numR = (-100 + angle % 180 * 0.55 * (distance / 320));
+                            R = String.valueOf(Math.round(numR));
+                        }
+                    }
+
+                    //                                                 0,1,100 1,0,100
+                    //1,RR,LL
+                    //    public static final String UP = "1,0";
+                    //    public static final String DOWN = "0,1";
+                    //    public static final String NONE = "0,0";
+//                    textX.setText("L:  "+L + " R: " + R);
+                    L = L.replace("-","");
+                    R = R.replace("-","");
                     mSendData = new SendData();
-                    CMD = "SS,00";
+                    CMD = direction+","+L+","+R;
+                    //보내기 시작
+                    mSendData.start();
+                }
+//                if (valueX == 0 && valueY ==0){
+//                    //event.getAction() == MotionEvent.ACTION_UP){
+//                    mSendData = new SendData();
+//                    CMD = "S"+",0, 0";
+//                    //보내기 시작
+//                    mSendData.start();
+//                }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    mSendData = new SendData();
+                    CMD = "S,0,0";
                     mSendData.start();
                 }
                 return true;
             }
         });
+
     }
 
     //데이터 보내는 쓰레드 클래스
