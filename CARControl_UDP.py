@@ -6,19 +6,6 @@ import sys
 TRIG = 23
 ECHO = 24
 
-TRIG_R = 27
-ECHO_R = 17
-
-TRIG_L = 18
-ECHO_L = 25
-
-# RIGHT_FORWARD = 16
-# RIGHT_BACKWARD = 20
-# RIGHT_PWM = 21
-# LEFT_FORWARD = 19
-# LEFT_BACKWARD = 26
-# LEFT_PWM = 13
-
 RIGHT_FORWARD = 19
 RIGHT_BACKWARD = 26
 RIGHT_PWM = 13
@@ -31,12 +18,6 @@ GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(TRIG, GPIO.OUT)
 GPIO.setup(ECHO, GPIO.IN)
-
-GPIO.setup(TRIG_R, GPIO.OUT)
-GPIO.setup(ECHO_R, GPIO.IN)
-
-GPIO.setup(TRIG_L, GPIO.OUT)
-GPIO.setup(ECHO_L, GPIO.IN)
 
 GPIO.setup(RIGHT_FORWARD,GPIO.OUT)
 GPIO.setup(RIGHT_BACKWARD,GPIO.OUT)
@@ -53,6 +34,26 @@ GPIO.output(LEFT_PWM,0)
 LEFT_MOTOR = GPIO.PWM(LEFT_PWM,100)
 LEFT_MOTOR.start(0)
 LEFT_MOTOR.ChangeDutyCycle(0)
+
+def getDistance():
+    GPIO.output(TRIG, False)
+    time.sleep(1)
+
+    GPIO.output(TRIG, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG,False)
+
+    while GPIO.input(ECHO)==0:
+        pulse_start = time.time()
+    while GPIO.input(ECHO)==1:
+        pulse_end = time.time()
+
+    pulse_duration = pulse_end - pulse_start
+
+    distance = pulse_duration * 17150
+    distance = round(distance,2)
+
+    return distance 
     
 #RIGHT Motor control
 def rightMotor(forward, backward, pwm):
@@ -111,7 +112,12 @@ def Poweroff():
     LEFT_MOTOR.stop()
     GPIO.cleanup()
     sys.exit()
-    
+
+def PrintDistance():
+    distance_value = getDistance()
+    if distance_value > 2 and distance_value < 400:
+        print("Distance is {:.2f} cm".format(distance_value))
+
     
 if __name__ == '__main__':
     #rightMotor(1 ,0, 60)
