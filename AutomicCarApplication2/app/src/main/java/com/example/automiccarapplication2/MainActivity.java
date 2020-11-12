@@ -69,7 +69,11 @@ public class MainActivity extends AppCompatActivity {
         js.setMinimumDistance(50);
 
         webView = (WebView) findViewById(R.id.webView);
-        String url ="http://192.168.0.41:5000/video_feed";
+        webView.setInitialScale(315);//스케일 비율 조정
+        webView.getSettings().setBuiltInZoomControls(false);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        String url ="http://192.168.0.41:8090/javascript_simple.html";
         webView.loadUrl(url);
 
         //종료 버튼
