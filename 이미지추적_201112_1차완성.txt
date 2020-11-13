@@ -1,0 +1,64 @@
+import cv2
+import numpy as np
+
+capture = cv2.VideoCapture(0) # 비디오 재생
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 480) # 비디오 크기 조절
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 320)
+
+# 이미지를 하나의 화면위에 합성시켜야 함
+ # 합성할 이미지 읽어오기
+track_img = cv2.imread("image1.png", cv2.IMREAD_ANYCOLOR)
+
+# 이미지 크기 조정
+track_img = cv2.resize(track_img, dsize=(75, 75), interpolation=cv2.INTER_AREA) 
+
+ # 합성할 이미지를 템플릿매칭을 위해 그레이스케일로 변환
+track_img_gray = cv2.cvtColor(track_img, cv2.COLOR_BGR2GRAY)
+
+ # 트래커 객체 생성
+tracker = cv2.TrackerCSRT_create()
+
+ # 첫 화면이자 결과 화면
+ret, frame = capture.read()
+ # 띄울 화면의 템플릿매칭을 위한 그레이스케일 변환 이미지
+frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+ # 그레이스케일 이미지 출력 윈도우창 이름
+cv2.namedWindow('test_image')
+ # 이미지 화면 출력 'test_image_gray'
+cv2.imshow('test_image', track_img_gray) 
+
+#cv2.namedWindow('Select Window') # 원본 이미지 출력
+#cv2.imshow('Select Window', frame)
+
+#rect = cv2.selectROI('Select Window', frame, fromCenter=False, showCrosshair=True)
+# rect 클래스를 반환하는 selectROI는 x, y, w, h값을 멤버변수로 가지므로 첫 프레임에서
+# 원하는 그림을 템플릿매칭시킨 다음 그 좌표를 반환해서 rect로 만든 다음 tracker.init에 삽입해야 할듯
+# TM_SQDIFF_NORMED, TM_CCOEFF_NORMED, TM_CCOEFF
+
+result = cv2.matchTemplate(frame_gray, track_img_gray, cv2.TM_CCOEFF_NORMED)
+minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
+x, y = minLoc
+h, w = track_img_gray.shape
+
+tracker.init(frame, (x, y, w, h))
+
+if not capture.isOpened():
+    exit()
+
+while True:
+    ret, frame = capture.read()
+
+    if not ret:
+        exit()
+
+    success, box = tracker.update(frame)
+    
+    left, top, w, h = [int(v) for v in box]
+
+    cv2.rectangle(frame, (left, top), (left+w, top+h), (0, 0, 255), 3)
+
+    cv2.imshow("Video", frame)
+    if cv2.waitKey(1) == ord('q') :
+        cv2.destroyAllWindows()
+        break

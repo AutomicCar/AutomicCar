@@ -1,0 +1,34 @@
+# CAR_OPENCV_test.py
+import cv2
+import numpy as np
+
+capture = cv2.VideoCapture(0) # 현재 웹캠 640x480
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+while True:
+    
+    ret, frame = capture.read()
+
+    dst = frame.copy()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    canny = cv2.Canny(gray, 5000, 1500, apertureSize = 5, L2gradient = True)
+    lines = cv2.HoughLinesP(canny, 0.8, np.pi / 180, 90, minLineLength = 100, maxLineGap = 150)
+
+    if type(lines).__name__ == 'NoneType':
+        pass
+    else:
+        for i in lines:
+            x1, y1, x2, y2 = i[0]
+            cv2.line(dst, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+            x3 = int((x1+x2)/2)
+            y3 = int((y1+y2)/2)                   
+            
+            cv2.circle(dst, (x3, y3), 3, (255, 0, 0), 5, cv2.FILLED)
+            
+    cv2.imshow("Video", dst)
+    if cv2.waitKey(1) == ord('q') : break
+    
+capture.release()
+cv2.destroyAllWindows()
